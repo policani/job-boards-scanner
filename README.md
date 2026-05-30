@@ -1,6 +1,6 @@
-# Job Search Workbench
+# Jobs Scanner
 
-Job Search Workbench is a local, single-file tool for job seekers who want to scan many employer career pages without opening each one manually.
+Jobs Scanner is a local, single-file tool for job seekers who want to scan many employer career pages without opening each one manually.
 
 It runs in your browser, pulls public job postings from supported employer job-board systems, filters them against your search criteria, and exports a review list to CSV. There is no account, no backend, no API key, and no hosted database.
 
@@ -43,7 +43,7 @@ The best use case is a curated target-company search: add companies you care abo
 
 ## How To Use
 
-1. Open `job_search_workbench.html` in a modern desktop browser.
+1. Open `jobs-scanner.html` in a modern desktop browser.
 2. Add title keywords, evidence keywords, exclusions, and source lines.
 3. Choose posting age, location, work arrangement, and salary floor.
 4. Click **Run Search**.
