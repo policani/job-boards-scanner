@@ -35,7 +35,7 @@ The best use case is a curated target-company search: add companies you care abo
 
 ## What It Does
 
-- Filters by posting age, work arrangement, country, metro area, salary floor, title keywords, body evidence, and exclusions.
+- Filters by posting age, work arrangement, country, metro area, selected salary amount, posted salary range, title keywords, body evidence, and exclusions.
 - Routes jobs into Main Candidates, Review Queue, and screened-out diagnostics.
 - Shows which sources worked, which were unavailable, and which are link-only.
 - Exports Main and Review results to CSV.
@@ -45,7 +45,7 @@ The best use case is a curated target-company search: add companies you care abo
 
 1. Open `job-boards-scanner.html` in a modern desktop browser.
 2. Add title keywords, evidence keywords, exclusions, and source lines.
-3. Choose posting age, location, work arrangement, and salary floor.
+3. Choose posting age, location, work arrangement, selected salary amount, and whether to require a posted salary range.
 4. Click **Run Search**.
 5. Review Main Candidates and Review Queue.
 6. Export CSV if you want to work the list elsewhere.
