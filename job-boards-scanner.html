@@ -364,12 +364,12 @@
         <div class="criteria-grid">
           <div class="criteria-block">
             <label for="titleStrong">Primary title keywords</label>
-            <p class="field-help">Use one title keyword or phrase per line. These are the strongest title matches for roles you want to find. Quotation marks are not required.</p>
+            <p class="field-help">Use one title keyword or phrase per line. Multi-word phrases can also match titles with a short word gap, such as AI Manager matching AI Program Manager. Quotation marks are not required.</p>
             <textarea id="titleStrong" placeholder="Program Manager&#10;Portfolio Manager&#10;Director of Operations"></textarea>
           </div>
           <div class="criteria-block">
             <label for="titleModerate">Related title keywords</label>
-            <p class="field-help">Use one related title word or phrase per line. These broaden discovery when the exact title varies across employers.</p>
+            <p class="field-help">Use one related title word or phrase per line. These broaden discovery when the exact title varies across employers, including short word gaps in title phrases.</p>
             <textarea id="titleModerate" placeholder="Operations&#10;Strategic Initiatives&#10;Transformation"></textarea>
           </div>
           <div class="criteria-block">
@@ -762,6 +762,43 @@ function hasAny(text, terms) {
   const t = norm(text);
   return terms.filter(term => term && t.includes(norm(term)));
 }
+function titleTokens(s) {
+  return norm(s).split(/\s+/).filter(Boolean);
+}
+function hasOrderedTitleTokens(textTokens, termTokens, maxGap = 3) {
+  if (termTokens.length < 2) return false;
+  for (let i = 0; i < textTokens.length; i++) {
+    if (textTokens[i] !== termTokens[0]) continue;
+    let pos = i;
+    let matched = true;
+    for (let j = 1; j < termTokens.length; j++) {
+      let next = -1;
+      const limit = Math.min(textTokens.length - 1, pos + maxGap + 1);
+      for (let k = pos + 1; k <= limit; k++) {
+        if (textTokens[k] === termTokens[j]) {
+          next = k;
+          break;
+        }
+      }
+      if (next < 0) {
+        matched = false;
+        break;
+      }
+      pos = next;
+    }
+    if (matched) return true;
+  }
+  return false;
+}
+function hasAnyTitle(text, terms) {
+  const t = norm(text);
+  const tokens = titleTokens(text);
+  return terms.filter(term => {
+    const q = norm(term);
+    if (!q) return false;
+    return t.includes(q) || hasOrderedTitleTokens(tokens, titleTokens(term));
+  });
+}
 function hasPhrase(text, term) {
   return norm(text).includes(norm(term));
 }
@@ -1015,9 +1052,9 @@ function analyzeJob(job, settings, criteria, stats = state.stats) {
   const gates = {};
   let reason = "";
   let score = 0;
-  const strongTitle = hasAny(title, criteria.titleStrong);
-  const moderateTitle = hasAny(title, criteria.titleModerate);
-  const seniorTitle = hasAny(title, criteria.seniorityTerms);
+  const strongTitle = hasAnyTitle(title, criteria.titleStrong);
+  const moderateTitle = hasAnyTitle(title, criteria.titleModerate);
+  const seniorTitle = hasAnyTitle(title, criteria.seniorityTerms);
   const bodyEvidenceHits = hasAny(body, criteria.bodyEvidence);
   const allFunctionTerms = [...criteria.titleStrong, ...criteria.titleModerate];
   const bodyFunction = hasAny(body, allFunctionTerms);
