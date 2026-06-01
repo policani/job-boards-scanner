@@ -285,7 +285,7 @@
 <body>
 <div class="top">
   <div>
-    <h1>Job Search Workbench</h1>
+    <h1>Job Boards Scanner</h1>
     <p>Local job search tool for filtering job-board results by posting age, location, pay, title terms, evidence terms, and exclusions.</p>
   </div>
 </div>
@@ -449,7 +449,7 @@
 </div>
 
 <script>
-// Free local metro data for Job Search Workbench.
+// Free local metro data for Job Boards Scanner.
 // Generated from U.S. Census Bureau July 2023 CBSA delineations and GeoNames US populated places.
 // GeoNames data is licensed under CC BY 4.0: https://www.geonames.org/
 // Embedded in this file so the workbench stays portable. No API key or network call is needed at runtime.
@@ -1400,7 +1400,7 @@ async function runScout() {
   };
   const criteria = currentCriteria();
   state.stats.totalSources = criteria.sources.length;
-  log(`Job Search Workbench: location ${locationSummary(settings)}, age ${settings.ageDays}d, minimum base ${money(settings.compFloor)}`);
+  log(`Job Boards Scanner: location ${locationSummary(settings)}, age ${settings.ageDays}d, minimum base ${money(settings.compFloor)}`);
   log(`Sources: ${criteria.sources.length}.`);
   if (!criteria.sources.length) {
     log("No sources are configured. Add at least one source in the Source list, then run the search again.");
