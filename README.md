@@ -1,6 +1,6 @@
-# Jobs Scanner
+# Job Boards Scanner
 
-Jobs Scanner is a local, single-file tool for job seekers who want to scan many employer career pages without opening each one manually.
+Job Boards Scanner is a local, single-file tool for job seekers who want to scan many employer career pages without opening each one manually.
 
 It runs in your browser, pulls public job postings from supported employer job-board systems, filters them against your search criteria, and exports a review list to CSV. There is no account, no backend, no API key, and no hosted database.
 
@@ -15,7 +15,7 @@ It is not an auto-apply tool, recruiting outreach tool, candidate database, or a
 
 ## What Job Seekers Can Search
 
-The workbench is most useful when your target employers publish jobs through common applicant tracking systems. These systems power many public careers pages, especially at technology companies, software companies, venture-backed startups, remote-first companies, SaaS businesses, and larger organizations with structured recruiting teams.
+The job boards scanner is most useful when employers publish jobs through common applicant tracking systems. These systems power many public careers pages, especially at technology companies, software companies, venture-backed startups, remote-first companies, SaaS businesses, and larger organizations with structured recruiting teams.
 
 The app can fetch postings from public job-board endpoints for:
 
@@ -43,7 +43,7 @@ The best use case is a curated target-company search: add companies you care abo
 
 ## How To Use
 
-1. Open `jobs-scanner.html` in a modern desktop browser.
+1. Open `job-boards-scanner.html` in a modern desktop browser.
 2. Add title keywords, evidence keywords, exclusions, and source lines.
 3. Choose posting age, location, work arrangement, and salary floor.
 4. Click **Run Search**.
@@ -113,7 +113,7 @@ Do not paste private resumes, credentials, application drafts, or personal candi
 
 Repository description:
 
-> Local-first job search workbench for filtering and ranking public employer job-board postings from Greenhouse, Lever, Ashby, SmartRecruiters, Recruitee, and more.
+> Local-first job boards scanner for filtering and ranking public employer job-board postings from Greenhouse, Lever, Ashby, SmartRecruiters, Recruitee, and more.
 
 Suggested topics:
 
