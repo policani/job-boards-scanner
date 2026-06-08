@@ -109,6 +109,10 @@ Do not paste private resumes, credentials, application drafts, or personal candi
 - Location classification is heuristic and should be checked before applying.
 - Workday is intentionally link-only in this single-file build.
 
+## License
+
+Source code is licensed under MIT. Documentation and examples are licensed under CC BY 4.0 with attribution to Marco Policani. See `LICENSE.md`.
+
 ## Suggested GitHub Metadata
 
 Repository description:
