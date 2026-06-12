@@ -893,6 +893,14 @@ function parseSources(text) {
     return Boolean(src.platform && src.slug);
   });
 }
+function formatAge(dateLike) {
+  if (!dateLike) return "";
+  const t = new Date(dateLike).getTime();
+  if (!Number.isFinite(t)) return "";
+  const hours = Math.max(0, Math.round((Date.now() - t) / 3600000));
+  if (hours < 48) return hours + "h ago";
+  return Math.round(hours / 24) + "d ago";
+}
 function isFresh(dateLike, maxDays) {
   if (!dateLike) return true;
   const t = new Date(dateLike).getTime();
@@ -1500,15 +1508,16 @@ function renderTable(list, title, target, emptyText) {
   const rows = list.map(r => `<tr>
     <td><span class="score">${r.score}</span><br><span class="confidence">${esc(r.confidence)}</span></td>
     <td><b>${esc(r.company)}</b><br><span class="hint">${esc(r.source)}</span></td>
-    <td>${esc(r.title)}<br><span class="hint">${esc(r.posted || "")}</span></td>
+    <td>${esc(r.title)}<br><span class="hint">${esc(formatAge(r.posted))}${r.posted ? " · " : ""}${esc(String(r.posted || "").slice(0, 10))}</span></td>
     <td>${esc(remoteLabel(r.remote))}<br><span class="hint">${esc(r.location || "")}</span></td>
-    <td class="nowrap">${esc(r.comp?.high ? money(r.comp.high) : "unknown")}</td>
+    <td class="nowrap">${esc((r.comp?.low || r.comp?.high) ? money(r.comp.low || r.comp.high) : "-")}</td>
+    <td class="nowrap">${esc((r.comp?.high || r.comp?.low) ? money(r.comp.high || r.comp.low) : "-")}</td>
     <td>${renderTags(r.signals)}</td>
     <td>${renderTags(r.risks, "tag risk")}${r.reason ? `<div class="hint">${esc(r.reason)}</div>` : ""}</td>
     <td><a href="${esc(r.url)}" target="_blank" rel="noreferrer">Apply</a></td>
   </tr>`).join("");
   $(target).innerHTML = list.length
-    ? `<div class="section-title">${esc(title)}</div><table><thead><tr><th>Match</th><th>Company</th><th>Role</th><th>Location</th><th>Salary High</th><th>Signals</th><th>Risks</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table>`
+    ? `<div class="section-title">${esc(title)}</div><table><thead><tr><th>Match</th><th>Company</th><th>Role</th><th>Location</th><th>Salary Low</th><th>Salary High</th><th>Signals</th><th>Risks</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table>`
     : `<div class="section-title">${esc(title)}</div><div class="empty">${esc(emptyText)}</div>`;
 }
 function remoteLabel(v) {
@@ -1696,7 +1705,7 @@ function exportCsv() {
   const rows = [...state.main, ...state.review];
   const headers = [
     "Row #", "Company Name", "Job Title", "Company Location", "Location Classification",
-    "Salary Range High", "Salary Range Display", "Full job description text",
+    "Salary Range Low", "Salary Range High", "Salary Range Display", "Full job description text",
     "Apply URL", "Source", "Posted Date", "Match Score", "Confidence",
     "Body Evidence Terms", "Risk Flags", "Review or Suppression Reason"
   ];
@@ -1707,7 +1716,8 @@ function exportCsv() {
     r.title,
     r.location || "",
     remoteLabel(r.remote),
-    r.comp?.high || "",
+    r.comp?.low || r.comp?.high || "",
+    r.comp?.high || r.comp?.low || "",
     r.comp?.display || "",
     words(r.body || ""),
     r.applyUrl || r.url || "",
