@@ -36,6 +36,9 @@ The best use case is a curated target-company search: add companies you care abo
 ## What It Does
 
 - Filters by posting age, work arrangement, country, metro area, selected salary amount, posted salary range, title keywords, body evidence, and exclusions.
+- Treats remote roles as location-independent, while hybrid and onsite roles are restricted to the metro city area(s) you select.
+- Shows a posting-age column (hours for fresh postings, then days) and a percentage match score.
+- Lets you sort every results column, including match score, age, company, salary, and signals.
 - Routes jobs into Main Candidates, Review Queue, and screened-out diagnostics.
 - Shows which sources worked, which were unavailable, and which are link-only.
 - Exports Main and Review results to CSV.
