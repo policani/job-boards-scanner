@@ -1073,30 +1073,52 @@ function containsUsStateName(text) {
   const n = norm(text);
   return Object.values(US_STATE_NAMES).some(stateName => n.includes(stateName));
 }
-function countryMatches(text, settings) {
+// True when the location string uses the standard "City, ST" form with a real US state code.
+function locHasUsStateCode(loc) {
+  const segs = String(loc || "").match(/,\s*([A-Za-z]{2})\b/g) || [];
+  return segs.some(seg => Object.prototype.hasOwnProperty.call(US_STATE_NAMES, seg.replace(/[,\s]/g, "").toLowerCase()));
+}
+const US_MAJOR_CITY_RX = /\b(new york|nyc|los angeles|san francisco|san jose|san diego|chicago|boston|austin|dallas|houston|denver|atlanta|miami|phoenix|philadelphia|portland|minneapolis|charlotte|nashville|pittsburgh|detroit|raleigh|columbus|salt lake city|las vegas|san antonio|sacramento|orlando|tampa|brooklyn|silicon valley|bay area)\b/;
+const US_REMOTE_FILLER_RX = /\b(remote|fully|hybrid|onsite|on site|anywhere|flexible|wfh|work from home|home based|distributed|first|friendly|eligible|optional|preferred)\b/g;
+// Decide whether a LOCATION string is consistent with a United States filter.
+// Allowlist approach: accept on a positive US signal or a generic (country-less)
+// remote location, and reject anything that names a non-US place. This is robust
+// against the long tail of foreign country/city spellings without enumerating them,
+// and it ignores the job body so work-authorization boilerplate ("authorized to
+// work in the United States") can no longer pull a foreign role into US results.
+function isUsLocation(loc, settings) {
+  const l = norm(loc);
+  if (!l) return true; // no location info: do not reject on absence
+  if (/\b(usa|us|u s a|u s|united states|north america|americas|nationwide|stateside)\b/.test(l)) return true;
+  if (containsMetroCity(loc, settings)) return true;
+  if (containsUsStateName(loc)) return true;
+  if (locHasUsStateCode(loc)) return true;
+  if (US_MAJOR_CITY_RX.test(l)) return true;
+  // Strip remote/filler words; if no concrete place name remains, treat it as a
+  // generic US-remote posting. Otherwise it names a non-US place: reject.
+  const residual = l.replace(US_REMOTE_FILLER_RX, " ").replace(/[0-9]+/g, " ").replace(/\s+/g, " ").trim();
+  return !residual;
+}
+function countryMatches(loc, settings) {
   const country = norm(settings.locationCountry);
   if (!country) return true;
-  if (isUnitedStatesCountry(country)) {
-    if (locationContains(text, settings.locationCountry)) return true;
-    if (containsMetroCity(text, settings)) return true;
-    if (containsUsStateName(text)) return true;
-    return false;
-  }
-  return locationContains(text, settings.locationCountry);
+  if (isUnitedStatesCountry(country)) return isUsLocation(loc, settings);
+  return locationContains(loc, settings.locationCountry);
 }
 function locationMatches(job, settings) {
   const selected = selectedWorkTypes(settings);
   if (!selected.length) return false;
   const locationText = String(job.location || "");
-  const text = [job.location, job.body].filter(Boolean).join(" ");
   const wantRemote = selected.includes("remote");
   const wantOffice = selected.includes("hybrid") || selected.includes("onsite");
   const hasMetro = (settings.metroCities || []).length > 0;
   const inMetro = !hasMetro || containsMetroLocation(locationText, settings);
 
+  // Country matching uses the LOCATION field only, never the job body, so that
+  // work-authorization boilerplate in the description cannot pull a foreign role in.
   // Remote roles are location-independent: gate by country only, never by metro.
   if (job.remote === "remote") {
-    return wantRemote && countryMatches(text, settings);
+    return wantRemote && countryMatches(locationText, settings);
   }
 
   // Office-based roles (hybrid / onsite, or a specific-location role left unclear)
@@ -1104,7 +1126,7 @@ function locationMatches(job, settings) {
   // to the selected metro city area(s) when any are set.
   const officeRole = job.remote === "hybrid" || job.remote === "onsite" || (job.remote === "unclear" && hasMetro);
   if (wantOffice && officeRole) {
-    return inMetro && countryMatches(text, settings);
+    return inMetro && countryMatches(locationText, settings);
   }
 
   return false;
