@@ -4,30 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Job Boards Scanner</title>
-<meta name="description" content="Job Boards Scanner: a free, local-first browser tool that scans public employer job boards (Greenhouse, Lever, Ashby, SmartRecruiters, Recruitee), filters postings by fit, and exports a review list to CSV.">
-<meta name="author" content="Marc Policani">
-<meta name="application-name" content="Job Boards Scanner">
-<meta name="version" content="1.0">
-<link rel="canonical" href="https://policani.net/tools/job-boards-scanner.html">
-<meta property="og:title" content="Job Boards Scanner">
-<meta property="og:description" content="Free local-first browser tool for scanning public employer job boards, filtering postings by fit, and exporting a review list to CSV.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://policani.net/tools/job-boards-scanner.html">
-<script type="application/ld+json">
-{
-"@context": "https://schema.org",
-"@type": "WebApplication",
-"name": "Job Boards Scanner",
-"softwareVersion": "1.0",
-"applicationCategory": "BrowserApplication",
-"operatingSystem": "Any",
-"url": "https://policani.net/tools/job-boards-scanner.html",
-"downloadUrl": "https://policani.net/tools/job-boards-scanner.html",
-"sameAs": ["https://github.com/policani/job-boards-scanner"],
-"offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
-"author": {"@type": "Person", "name": "Marc Policani", "url": "https://policani.net/"}
-}
-</script>
 <style>
   :root {
     --ink:#172033;
@@ -95,11 +71,6 @@
   button.secondary { background:white; color:var(--blue); }
   button.warn { border-color:#c9902d; background:#fff7e8; color:#7f5209; }
   button:disabled { opacity:.55; cursor:default; }
-  .version-line {
-    font-size:12px;
-    color:var(--muted);
-    margin:4px 0 0;
-  }
   .top {
     display:flex;
     gap:10px;
@@ -251,6 +222,9 @@
     vertical-align:top;
   }
   th { background:#f0f6fa; color:var(--blue2); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+  th.sortable { cursor:pointer; user-select:none; white-space:nowrap; }
+  th.sortable:hover { background:#e1edf6; }
+  th.sortable[data-sort="asc"], th.sortable[data-sort="desc"] { background:#dcebf7; color:var(--blue2); }
   tr:last-child td { border-bottom:0; }
   .score { color:var(--green); font-weight:900; }
   .confidence { font-size:12px; color:var(--muted); }
@@ -316,7 +290,6 @@
   <div>
     <h1>Job Boards Scanner</h1>
     <p>Local job search tool for filtering job-board results by posting age, location, pay, title terms, evidence terms, and exclusions.</p>
-    <p class="version-line">v1.0 &middot; Run or download the latest version at <a href="https://policani.net/tools/job-boards-scanner.html">policani.net</a> &middot; <a href="https://github.com/policani/job-boards-scanner">Source</a></p>
   </div>
 </div>
 
@@ -489,12 +462,12 @@ window.JOB_SEARCH_METRO_DATA = {"version":"2023-census-geonames-pop1000","source
 const STORAGE_KEY = "jobSearchEngineCriteria_v1";
 const LEGACY_STORAGE_KEYS = [];
 const SOURCE_CONCURRENCY = 8;
-const DEFAULT_COMP_FLOOR = 200000;
+const DEFAULT_COMP_FLOOR = 170000;
 function splitSourceText(text) {
   return String(text || "").split(/\s+/).map(x => x.trim()).filter(Boolean);
 }
 const GH_SOURCE_SLUGS = splitSourceText(`
-smartsheet figma gitlab aha asana airtable pendo amplitude hubspot mixpanel qualtrics remote degreed lattice brex gongio salesloft showpad 6sense invoca five9 crossbeam cresta partnerstack iterable dialpad impact braze klaviyo listrak bombora labelbox apollo anthropic databricks starburst fivetran sisense intercom chainguard cloudflare verkada onetrust samsara okta zscaler axonius jfrog veracode logicmonitor postman workato celigo carta newrelic payoneer gusto pleo melio faire flexport fourkites collibra nice project44 anaplan wrike modernhealth affirm calm coursera udemy udacity skillsoft 2u justworks pagerduty zuora stripe toast twilio sendbird vonage zenvia algolia elastic bandwidth bird fastspring ivalua solarwinds bridgeu learnupon chargepoint icon netcracker flexe make kayak skyscanner 7shifts alloy bob checkr conga datadog guidde honeycomb hyperproof instabase laika mixmax packlink pandadoc pirateship reachdesk relativity sendcloud sterling stitch taxbit workstream launchdarkly zenoti descript netlify grafanalabs dbtlabsinc boulevard homelight buildkite buildkite-talent-community webflow upgrade echodynecorp echodyneinternships hopskipdrive aiserajobs omadahealth philo talkdesk2 mntn hs headspaceproviders gofundme placementsio snorkelai paveakatroveinformationtechnologies whalarinc sourcegraph91 mdclarity runpod extrahopnetworks reddit trustwill astranis xealth casago scopely
+smartsheet figma gitlab aha asana airtable pendo amplitude hubspot mixpanel qualtrics remote degreed lattice brex gongio salesloft showpad 6sense invoca five9 crossbeam cresta partnerstack iterable dialpad impact braze klaviyo listrak bombora labelbox apollo anthropic databricks starburst fivetran sisense intercom chainguard cloudflare verkada onetrust samsara okta zscaler axonius jfrog veracode logicmonitor postman workato celigo carta newrelic payoneer gusto pleo melio faire flexport fourkites collibra nice project44 anaplan wrike modernhealth affirm calm coursera udemy udacity skillsoft 2u justworks pagerduty zuora stripe toast twilio sendbird vonage zenvia algolia elastic bandwidth bird fastspring ivalua solarwinds bridgeu learnupon chargepoint icon netcracker flexe make kayak skyscanner 7shifts alloy bob checkr conga datadog guidde honeycomb hyperproof instabase laika mixmax packlink pandadoc pirateship reachdesk relativity sendcloud sterling stitch taxbit workstream launchdarkly zenoti descript netlify grafanalabs dbtlabsinc boulevard homelight buildkite buildkite-talent-community webflow upgrade echodynecorp echodyneinternships hopskipdrive aiserajobs omadahealth philo talkdesk2 mntn hs headspaceproviders gofundme placementsio snorkelai paveakatroveinformationtechnologies whalarinc sourcegraph91 mdclarity runpod extrahopnetworks reddit trustwill astranis xealth casago scopely robinhood dropbox pinterest discord instacart airbnb lyft chime sofi squarespace roblox
 `);
 const ASHBY_SOURCE_SLUGS = splitSourceText(`
 ashby linear loom fellow tango dovetail orbit sierra perplexity salesloft mistral harvey cohere orca wiz langchain drata oneleet mercury wrapbook numeric camunda ramp vanta abacum notion 1password airtable temporal plane inngest amplitude posthog fullstory prometheus sentry prefect astronomer conductor windmill kestra anyscale modal airbyte coalesce sesame lightdash deel pave cube compa persona sardine talkdesk homebase socure kira anrok project44 convey hyperscience nanonets kustomer lemlist helpscout paddle stytch workos gorgias clerk absorblms angi atlan boomi capchase clearco clickup datafold demandbase docebo echo expensify g2 gainsight hopper jobber kiwi kong leapsome mosaic mural n8n openai orum plaid planhat procurify qualified runway sift snowflake snyk spendesk synthesia thumbtack vitally whatnot writer zapier zip tilthq chilipiper alchemy virtahealth betterup hiya frontcareers pinecone assembledhq Maven-agi pearpop read-ai cinder rula revenuecat goteleport hinge-health
@@ -923,13 +896,60 @@ function parseSources(text) {
     return Boolean(src.platform && src.slug);
   });
 }
+function ageHours(dateLike) {
+  if (!dateLike) return Infinity;
+  const t = new Date(dateLike).getTime();
+  if (!Number.isFinite(t)) return Infinity;
+  return Math.max(0, (Date.now() - t) / 3600000);
+}
 function formatAge(dateLike) {
   if (!dateLike) return "";
-  const t = new Date(dateLike).getTime();
-  if (!Number.isFinite(t)) return "";
-  const hours = Math.max(0, Math.round((Date.now() - t) / 3600000));
-  if (hours < 48) return hours + "h ago";
-  return Math.round(hours / 24) + "d ago";
+  const hours = ageHours(dateLike);
+  if (!Number.isFinite(hours)) return "";
+  const h = Math.round(hours);
+  if (h <= 72) return h + "h";
+  return Math.ceil(h / 24) + "d";
+}
+// Click-to-sort support for the results tables.
+const SORT_ACCESSORS = {
+  match: r => Number(r.score) || 0,
+  age: r => ageHours(r.posted),
+  company: r => norm(r.company || ""),
+  role: r => norm(r.title || ""),
+  location: r => norm(remoteLabel(r.remote) + " " + (r.location || "")),
+  salary: r => Number(r.comp && r.comp.high) || 0,
+  signals: r => (r.signals || []).length,
+  risks: r => (r.risks || []).length,
+  link: r => norm(r.url || ""),
+};
+const SORT_DEFAULT_DIR = {
+  match: "desc", age: "asc", company: "asc", role: "asc",
+  location: "asc", salary: "desc", signals: "desc", risks: "desc", link: "asc",
+};
+function sortRows(list, key, dir) {
+  const acc = SORT_ACCESSORS[key] || SORT_ACCESSORS.match;
+  return list.slice().sort((a, b) => {
+    const va = acc(a), vb = acc(b);
+    if (typeof va === "string" || typeof vb === "string") {
+      const c = String(va).localeCompare(String(vb));
+      return dir === "asc" ? c : -c;
+    }
+    const aBad = !Number.isFinite(va), bBad = !Number.isFinite(vb);
+    if (aBad && bBad) return 0;
+    if (aBad) return 1;
+    if (bBad) return -1;
+    return dir === "asc" ? va - vb : vb - va;
+  });
+}
+function sortTable(target, key) {
+  state.tableSort = state.tableSort || {};
+  const cur = state.tableSort[target];
+  const dir = cur && cur.key === key
+    ? (cur.dir === "asc" ? "desc" : "asc")
+    : (SORT_DEFAULT_DIR[key] || "asc");
+  state.tableSort[target] = { key, dir };
+  const t = (state.tables || {})[target];
+  if (t) renderTable(t.list, t.title, target, t.emptyText);
 }
 function isFresh(dateLike, maxDays) {
   if (!dateLike) return true;
@@ -999,7 +1019,7 @@ function remoteClass(location, body) {
   if (nonUsRemote.test(text) && !usRemote.test(text)) return "onsite";
   if (specificLocation && explicitRemoteModel && !explicitRemoteStrongBody) return "unclear";
   if (explicitRemoteModel && !nonUs.test(loc)) return "remote";
-  if (specificLocation) return "unclear";
+  if (specificLocation) return "onsite";
   if (/\bremote\b/i.test(text) && !nonUs.test(loc)) return "unclear";
   return "unclear";
 }
@@ -1062,13 +1082,28 @@ function countryMatches(text, settings) {
 }
 function locationMatches(job, settings) {
   const selected = selectedWorkTypes(settings);
-  const typeMatches = selected.length ? selected.includes(job.remote) : false;
-  if (!typeMatches) return false;
+  if (!selected.length) return false;
   const locationText = String(job.location || "");
   const text = [job.location, job.body].filter(Boolean).join(" ");
-  if ((settings.metroCities || []).length && job.remote !== "remote" && !containsMetroLocation(locationText, settings)) return false;
-  if (!countryMatches(text, settings)) return false;
-  return true;
+  const wantRemote = selected.includes("remote");
+  const wantOffice = selected.includes("hybrid") || selected.includes("onsite");
+  const hasMetro = (settings.metroCities || []).length > 0;
+  const inMetro = !hasMetro || containsMetroLocation(locationText, settings);
+
+  // Remote roles are location-independent: gate by country only, never by metro.
+  if (job.remote === "remote") {
+    return wantRemote && countryMatches(text, settings);
+  }
+
+  // Office-based roles (hybrid / onsite, or a specific-location role left unclear)
+  // are captured only when an office arrangement is selected, and are restricted
+  // to the selected metro city area(s) when any are set.
+  const officeRole = job.remote === "hybrid" || job.remote === "onsite" || (job.remote === "unclear" && hasMetro);
+  if (wantOffice && officeRole) {
+    return inMetro && countryMatches(text, settings);
+  }
+
+  return false;
 }
 function locationKnown(actual) {
   return ["remote", "hybrid", "onsite"].includes(actual);
@@ -1242,7 +1277,7 @@ async function fetchGreenhouse(slug) {
     const body = words(j.content || "");
     const comp = parseComp(body);
     const remote = remoteClass(j.location?.name, body);
-    return baseJob(slug, j.title || "", "greenhouse", j.absolute_url || "", j.location?.name || "", String(j.updated_at || "").slice(0, 10), body, comp, remote);
+    return baseJob(slug, j.title || "", "greenhouse", j.absolute_url || "", j.location?.name || "", String(j.updated_at || ""), body, comp, remote);
   });
 }
 async function fetchAshby(slug) {
@@ -1259,7 +1294,7 @@ async function fetchAshby(slug) {
     if (!comp) comp = parseComp(body);
     let remote = remoteClass(j.location || "", body);
     if (j.isRemote === true && remote === "unclear" && /\b(remote|united states|usa|u\.s\.|us)\b/i.test(j.location || "")) remote = "remote";
-    return baseJob(company, j.title || "", "ashby", j.applyUrl || j.jobUrl || "", j.location || "", String(j.publishedAt || "").slice(0, 10), body, comp, remote);
+    return baseJob(company, j.title || "", "ashby", j.applyUrl || j.jobUrl || "", j.location || "", String(j.publishedAt || ""), body, comp, remote);
   });
 }
 async function fetchLever(slug) {
@@ -1281,7 +1316,7 @@ async function fetchLever(slug) {
     const workModel = [location, j.workplaceType].filter(Boolean).join(" ");
     let remote = remoteClass(workModel, body);
     if (j.workplaceType === "remote" && remote === "unclear" && /\b(united states|usa|u\.s\.|us|remote)\b/i.test(workModel)) remote = "remote";
-    const posted = j.createdAt ? new Date(j.createdAt).toISOString().slice(0, 10) : "";
+    const posted = j.createdAt ? new Date(j.createdAt).toISOString() : "";
     return baseJob(slug, j.text || "", "lever", j.hostedUrl || j.applyUrl || "", location, posted, body, parseComp(body), remote);
   });
 }
@@ -1298,7 +1333,7 @@ async function fetchRecruitee(slug) {
     const workModel = [location, j.remote ? "remote" : "", j.hybrid ? "hybrid" : "", j.on_site ? "onsite" : ""].filter(Boolean).join(" ");
     let remote = remoteClass(workModel, body);
     if (j.remote === true && remote === "unclear" && /\b(united states|usa|u\.s\.|us|remote)\b/i.test(workModel)) remote = "remote";
-    const posted = String(j.published_at || j.created_at || j.updated_at || "").slice(0, 10);
+    const posted = String(j.published_at || j.created_at || j.updated_at || "");
     return baseJob(j.company_name || slug, j.title || j.sharing_title || "", "recruitee", j.careers_url || j.careers_apply_url || "", location, posted, body, parseComp([j.salary, body].filter(Boolean).join(" ")), remote);
   });
 }
@@ -1314,7 +1349,7 @@ async function fetchSmartRecruiters(slug) {
     const loc = [j.location?.city, j.location?.region, j.location?.country].filter(Boolean).join(", ");
     let remote = remoteClass(loc, body);
     if (j.location?.remote && remote === "unclear" && /\b(remote|united states|usa|u\.s\.|us)\b/i.test(loc)) remote = "remote";
-    jobs.push(baseJob(slug, j.name || "", "smartrecruiters", `https://jobs.smartrecruiters.com/${slug}/${j.id}`, loc, String(j.releasedDate || j.updatedAt || "").slice(0, 10), body, parseComp(body), remote));
+    jobs.push(baseJob(slug, j.name || "", "smartrecruiters", `https://jobs.smartrecruiters.com/${slug}/${j.id}`, loc, String(j.releasedDate || j.updatedAt || ""), body, parseComp(body), remote));
   }
   return jobs;
 }
@@ -1348,7 +1383,7 @@ async function fetchHimalayas(criteria) {
         const body = words(j.description || j.description_html || j.descriptionHtml || "");
         const location = j.location || "Remote";
         const comp = parseComp([j.salary_range, j.salaryRange, body].filter(Boolean).join(" "));
-        jobs.push(baseJob(company, title, "himalayas", j.url || j.apply_url || "", location, String(j.published_at || j.updated_at || j.created_at || "").slice(0, 10), body, comp, himalayasRemoteClass(location, body)));
+        jobs.push(baseJob(company, title, "himalayas", j.url || j.apply_url || "", location, String(j.published_at || j.updated_at || j.created_at || ""), body, comp, himalayasRemoteClass(location, body)));
       }
     } catch {
       failures++;
@@ -1534,20 +1569,42 @@ function uniqueResults(list) {
 function renderTags(items, cls = "tag") {
   return (items || []).slice(0, 5).map(x => `<span class="${cls}">${esc(x)}</span>`).join("");
 }
+function sortHeader(label, key, target) {
+  const s = (state.tableSort || {})[target] || { key: "match", dir: "desc" };
+  const arrow = s.key === key ? (s.dir === "asc" ? " \u25b2" : " \u25bc") : "";
+  return `<th class="sortable" data-sort="${key === s.key ? s.dir : ""}" onclick="sortTable('${target}','${key}')" title="Click to sort by ${esc(label)}">${esc(label)}${arrow}</th>`;
+}
 function renderTable(list, title, target, emptyText) {
-  const rows = list.map(r => `<tr>
-    <td><span class="score">${r.score}</span><br><span class="confidence">${esc(r.confidence)}</span></td>
+  state.tables = state.tables || {};
+  state.tableSort = state.tableSort || {};
+  state.tables[target] = { list, title, emptyText };
+  if (!state.tableSort[target]) state.tableSort[target] = { key: "match", dir: "desc" };
+  const sort = state.tableSort[target];
+  const sorted = sortRows(list, sort.key, sort.dir);
+  const rows = sorted.map(r => `<tr>
+    <td><span class="score">${esc((Number(r.score) || 0) + "%")}</span><br><span class="confidence">${esc(r.confidence)}</span></td>
+    <td class="nowrap">${esc(formatAge(r.posted) || "unknown")}<br><span class="hint">${esc(String(r.posted || "").slice(0, 10))}</span></td>
     <td><b>${esc(r.company)}</b><br><span class="hint">${esc(r.source)}</span></td>
-    <td>${esc(r.title)}<br><span class="hint">${esc(formatAge(r.posted))}${r.posted ? " · " : ""}${esc(String(r.posted || "").slice(0, 10))}</span></td>
+    <td>${esc(r.title)}</td>
     <td>${esc(remoteLabel(r.remote))}<br><span class="hint">${esc(r.location || "")}</span></td>
-    <td class="nowrap">${esc((r.comp?.low || r.comp?.high) ? money(r.comp.low || r.comp.high) : "-")}</td>
-    <td class="nowrap">${esc((r.comp?.high || r.comp?.low) ? money(r.comp.high || r.comp.low) : "-")}</td>
+    <td class="nowrap">${esc(r.comp?.high ? money(r.comp.high) : "unknown")}</td>
     <td>${renderTags(r.signals)}</td>
     <td>${renderTags(r.risks, "tag risk")}${r.reason ? `<div class="hint">${esc(r.reason)}</div>` : ""}</td>
     <td><a href="${esc(r.url)}" target="_blank" rel="noreferrer">Apply</a></td>
   </tr>`).join("");
+  const head = [
+    sortHeader("Match", "match", target),
+    sortHeader("Age", "age", target),
+    sortHeader("Company", "company", target),
+    sortHeader("Role", "role", target),
+    sortHeader("Location", "location", target),
+    sortHeader("Salary High", "salary", target),
+    sortHeader("Signals", "signals", target),
+    sortHeader("Risks", "risks", target),
+    sortHeader("Link", "link", target),
+  ].join("");
   $(target).innerHTML = list.length
-    ? `<div class="section-title">${esc(title)}</div><table><thead><tr><th>Match</th><th>Company</th><th>Role</th><th>Location</th><th>Salary Low</th><th>Salary High</th><th>Signals</th><th>Risks</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table>`
+    ? `<div class="section-title">${esc(title)}</div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`
     : `<div class="section-title">${esc(title)}</div><div class="empty">${esc(emptyText)}</div>`;
 }
 function remoteLabel(v) {
@@ -1631,7 +1688,7 @@ function renderDiagnostics() {
     .filter(r => r.score >= 40 && !/^title exclude|location mismatch|body exclude/.test(r.reason || ""))
     .sort((a, b) => b.score - a.score)
     .slice(0, 12)
-    .map(r => `<div class="source-row"><span><b>${esc(r.score)} ${esc(r.company)}</b><br>${esc(r.title)}</span><span>${esc(r.reason || "")}</span></div>`)
+    .map(r => `<div class="source-row"><span><b>${esc(r.score)}% ${esc(r.company)}</b><br>${esc(r.title)}</span><span>${esc(r.reason || "")}</span></div>`)
     .join("");
 
   const suggestions = [];
@@ -1735,7 +1792,7 @@ function exportCsv() {
   const rows = [...state.main, ...state.review];
   const headers = [
     "Row #", "Company Name", "Job Title", "Company Location", "Location Classification",
-    "Salary Range Low", "Salary Range High", "Salary Range Display", "Full job description text",
+    "Salary Range High", "Salary Range Display", "Full job description text",
     "Apply URL", "Source", "Posted Date", "Match Score", "Confidence",
     "Body Evidence Terms", "Risk Flags", "Review or Suppression Reason"
   ];
@@ -1746,8 +1803,7 @@ function exportCsv() {
     r.title,
     r.location || "",
     remoteLabel(r.remote),
-    r.comp?.low || r.comp?.high || "",
-    r.comp?.high || r.comp?.low || "",
+    r.comp?.high || "",
     r.comp?.display || "",
     words(r.body || ""),
     r.applyUrl || r.url || "",
