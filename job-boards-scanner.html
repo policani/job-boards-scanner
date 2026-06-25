@@ -990,7 +990,11 @@ function remoteClass(location, body) {
   const bodyText = String(body || "");
   const text = `${loc} ${bodyText}`;
   const nonUs = /\b(canada|mexico|uk|united kingdom|ireland|india|australia|germany|france|netherlands|singapore|emea|apac|latam|brazil|colombia|philippines|dubai|united arab emirates|uae|poland|london|toronto|dublin|bangalore|bengaluru|sydney|berlin|paris|vancouver)\b/i;
-  const usRemote = /\b(united states|usa|u\.s\.|us-remote|remote us|remote - us|remote, us|remote, united states|remote \(us\)|remote within the united states|anywhere in the united states|remote role based in the us)\b/i;
+  // US-remote signal: only phrases that actually denote a US-based remote role.
+  // Bare country mentions ("United States", "USA", "U.S.") are NOT remote signals
+  // because work-authorization boilerplate ("authorized to work in the United States")
+  // appears in almost every posting and would mislabel onsite/hybrid roles as remote.
+  const usRemote = /\b(us-remote|us remote|remote us|remote - us|remote, us|remote, united states|remote \(us\)|remote within the united states|remote in the united states|anywhere in the united states|remote role based in the us|remote anywhere in the us)\b/i;
   const structuralOfficeBody = /\b(hybrid|onsite|on-site|relocation required|local candidates only|commute to|three days per week|two days per week|office days|in person collaboration|must be located|must reside|within commuting distance)\b|\b(this role|this position|the role|the position)\b.{0,90}\b(office-based|in-office|work from our office|work out of our office)\b/i;
   const nonUsRemote = /\bremote\b.{0,60}\b(canada|mexico|uk|united kingdom|ireland|india|australia|germany|france|netherlands|singapore|emea|apac|latam|brazil|colombia|philippines|dubai|united arab emirates|uae|poland|bengaluru)\b|\b(canada|mexico|uk|united kingdom|ireland|india|australia|germany|france|netherlands|singapore|emea|apac|latam|brazil|colombia|philippines|dubai|united arab emirates|uae|poland|bengaluru)\b.{0,60}\bremote\b/i;
   const remoteModelRx = /\b(fully remote|100% remote|remote-first|remote first|remote eligible|remote-friendly|distributed team|distributed workforce|work remotely from anywhere|this role is remote|this position is remote|remote position|remote role|home-based role|work from home position)\b/i;
